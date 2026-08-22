@@ -1,0 +1,38 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#37003c"><title>プレミア順位予想 2026/27</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f2f8;color:#19121f;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{background:#37003c;color:#fff;padding:22px 15px 18px;text-align:center}h1{font-size:24px;margin:0}header p{font-size:13px;margin:6px 0 0;opacity:.88}main{max-width:720px;margin:auto;padding:12px 12px 35px}.bar{position:sticky;top:0;z-index:3;background:#f5f2f8;padding:8px 0}.hint,.card{background:#fff;border-radius:14px;padding:13px;margin:7px 0;box-shadow:0 2px 8px #0000000d}.hint{font-size:13px}.row{display:flex;align-items:center;gap:9px;padding:9px 10px;background:#fff;border-radius:12px;margin:6px 0;box-shadow:0 1px 5px #00000010}.rank{width:28px;text-align:center;font-weight:800;color:#37003c}.team{flex:1;font-weight:700}.controls{display:flex;gap:4px}button{border:0;border-radius:9px;padding:9px 10px;font-weight:750;font-size:12px;background:#eee8f1;color:#37003c}button:active{transform:scale(.97)}.primary{background:#37003c;color:#fff}.danger{background:#ffe9ec;color:#a80019}.actions{display:flex;gap:7px;flex-wrap:wrap}.actions button{flex:1;min-width:110px}h2{font-size:15px;margin:16px 2px 7px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.zone{background:#fff;border-radius:12px;padding:10px;font-size:12px;line-height:1.7}.zone b{font-size:13px}.score{font-size:12px;color:#62596a;margin-top:3px}.saved{text-align:center;font-size:11px;color:#6c6371;margin:7px}.legend{font-size:11px;color:#6c6371;margin-top:8px}@media(max-width:430px){.grid{grid-template-columns:1fr}.team{font-size:14px}button{padding:9px 8px}}
+</style></head><body>
+<header><h1>⚽ 2026/27 プレミアリーグ<br>順位予想メーカー</h1><p>スマホでタップするだけで順位を入れ替え</p></header>
+<main><div class="bar"><div class="hint">👆 <b>▲▼ボタン</b>で順位を変更できます。ドラッグ不要なのでiPhoneでも操作しやすい仕様です。</div></div>
+<div id="list"><div class="hint">読み込み中…</div></div>
+<div class="actions"><button class="primary" onclick="save()">💾 保存</button><button onclick="copyResult()">📋 結果をコピー</button><button onclick="share()">📤 共有</button><button class="danger" onclick="resetList()">↩ リセット</button></div>
+<div class="saved" id="saved"></div>
+<h2>📊 予想カテゴリー</h2><div class="grid" id="zones"></div>
+<h2>📝 予想メモ</h2><div class="card"><div class="score">「なぜこの順位？」を自分用に記録できます。</div><textarea id="memo" style="width:100%;margin-top:8px;border:1px solid #ddd;border-radius:9px;padding:9px;min-height:80px;font:inherit" placeholder="例：トッテナムは新監督効果に期待"></textarea></div>
+<div class="legend">※ 欧州大会の出場枠はシーズンの確定条件により変動するため、ここでは目安として表示しています。</div></main>
+<script>
+const teams=["Tottenham Hotspur","Arsenal","Manchester City","Liverpool","Chelsea","Manchester United","Leeds United","Aston Villa","Brighton","Fulham","Crystal Palace","Sunderland","Hull City","Ipswich Town","Coventry City","Everton","Brentford","Nottingham Forest","Bournemouth","Newcastle United"];const jp={"Tottenham Hotspur":"トッテナム","Arsenal":"アーセナル","Manchester City":"マンチェスター・シティ","Liverpool":"リヴァプール","Chelsea":"チェルシー","Manchester United":"マンチェスター・ユナイテッド","Leeds United":"リーズ","Aston Villa":"アストン・ヴィラ","Brighton":"ブライトン","Fulham":"フラム","Crystal Palace":"クリスタル・パレス","Sunderland":"サンダーランド","Hull City":"ハル・シティ","Ipswich Town":"イプスウィッチ・タウン","Coventry City":"コヴェントリー","Everton":"エヴァートン","Brentford":"ブレントフォード","Nottingham Forest":"ノッティンガム・フォレスト","Bournemouth":"ボーンマス","Newcastle United":"ニューカッスル"};let saved=null;
+try{saved=JSON.parse(localStorage.getItem("pl2627_v2")||"null");}catch(e){saved=null;}
+let order=(saved && Array.isArray(saved.order) && saved.order.length===20)?saved.order.slice():teams.slice();
+document.getElementById("memo").value=(saved && saved.memo)?saved.memo:"";
+function render(){
+  var list=document.getElementById("list");
+  list.innerHTML="";
+  order.forEach(function(t,i){
+    var r=document.createElement("div");
+    r.className="row";
+    r.innerHTML='<div class="rank">'+(i+1)+'</div><div class="team">'+(jp[t]||t)+'</div><div class="controls"><button onclick="move('+i+',-1)" aria-label="上へ">▲</button><button onclick="move('+i+',1)" aria-label="下へ">▼</button></div>';
+    list.appendChild(r);
+  });
+  zones();
+}
+function move(i,d){let j=i+d;if(j<0||j>=order.length)return;[order[i],order[j]]=[order[j],order[i]];render();autoSave()}
+function zones(){let z=document.getElementById("zones");z.innerHTML=`<div class="zone"><b>🏆 優勝</b><br>${jp[order[0]]}</div><div class="zone"><b>⭐ CL圏</b><br>${order.slice(0,4).map(x=>jp[x]).join("・")}</div><div class="zone"><b>🟢 欧州圏目安</b><br>${order.slice(4,7).map(x=>jp[x]).join("・")}</div><div class="zone"><b>🔴 降格</b><br>${order.slice(-3).map(x=>jp[x]).join("・")}</div>`}
+function autoSave(){localStorage.setItem("pl2627_v2",JSON.stringify({order,memo:document.getElementById("memo").value}));document.getElementById("saved").textContent="自動保存済み"}
+function save(){autoSave();document.getElementById("saved").textContent="✅ 保存しました"}
+function resetList(){if(confirm("最初の順位に戻しますか？")){order=[...teams];document.getElementById("memo").value="";localStorage.removeItem("pl2627_v2");render();}}
+function resultText(){return "【2026/27 プレミアリーグ順位予想】\n"+order.map((x,i)=>`${i+1}位 ${jp[x]}`).join("\n")+"\n\n🏆優勝："+jp[order[0]]+"\n⭐CL圏："+order.slice(0,4).map(x=>jp[x]).join("・")+"\n🔴降格："+order.slice(-3).map(x=>jp[x]).join("・")}
+function copyResult(){navigator.clipboard?.writeText(resultText()).then(()=>alert("コピーしました！")).catch(()=>alert(resultText()))}
+function share(){if(navigator.share)navigator.share({title:"2026/27 プレミア順位予想",text:resultText()});else copyResult()}
+document.getElementById("memo").addEventListener("input",autoSave);render();
+</script></body></html>
